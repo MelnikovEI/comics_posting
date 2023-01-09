@@ -9,10 +9,9 @@ VK_API_VERSION = '5.131'
 
 
 def download_image(url, file_name, params=None):
-    Path(Path.cwd() / 'images').mkdir(parents=True, exist_ok=True)
     response = requests.get(url, params=params)
     response.raise_for_status()
-    with open(Path.cwd() / 'images' / file_name, 'wb') as file_to_save:
+    with open(Path.cwd() / file_name, 'wb') as file_to_save:
         file_to_save.write(response.content)
 
 
@@ -54,7 +53,7 @@ def comics_posting(params, img_file_name, comics_comment):
     upload_url = vk_response.json()['response']['upload_url']
 
     # Отправляем фото на сервер
-    with open(os.path.join('images', img_file_name), 'rb') as file:
+    with open(img_file_name, 'rb') as file:
         files = {
             'photo': file,
         }
@@ -101,7 +100,7 @@ def main():
     # Публикуем комикс
     comics_posting(params, img_file_name, comics_comment)
     # Удаляем скачанный файл
-    os.remove(os.path.join('images', img_file_name))
+    os.remove(img_file_name)
 
 
 if __name__ == '__main__':
