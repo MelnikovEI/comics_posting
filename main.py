@@ -8,7 +8,7 @@ from environs import Env
 VK_API_VERSION = '5.131'
 
 
-def load_image(url, file_name, params=None):
+def download_image(url, file_name, params=None):
     Path(Path.cwd() / 'images').mkdir(parents=True, exist_ok=True)
     response = requests.get(url, params=params)
     response.raise_for_status()
@@ -23,7 +23,7 @@ def get_ext(url: str) -> str:
     return split_file_name[1]
 
 
-def get_last_comics_numb():
+def get_last_comics_number():
     last_comics_url = "https://xkcd.com/info.0.json"
     xkcd_response = requests.get(last_comics_url)
     xkcd_response.raise_for_status()
@@ -31,8 +31,8 @@ def get_last_comics_numb():
     return comics_item['num']
 
 
-def load_rnd_comics():
-    numb = random.randint(1, get_last_comics_numb())
+def download_rnd_comics():
+    numb = random.randint(1, get_last_comics_number())
     comics_url = f"https://xkcd.com/{numb}/info.0.json"
     xkcd_response = requests.get(comics_url)
     xkcd_response.raise_for_status()
@@ -41,7 +41,7 @@ def load_rnd_comics():
     comics_comment = comics_item['alt']
     if img_link:
         img_file_mane = f'comics_{numb}{get_ext(img_link)}'
-        load_image(img_link, img_file_mane)
+        download_image(img_link, img_file_mane)
         return img_file_mane, comics_comment
 
 
@@ -97,7 +97,7 @@ def main():
     }
 
     # Скачиваем комикс
-    img_file_name, comics_comment = load_rnd_comics()
+    img_file_name, comics_comment = download_rnd_comics()
     # Публикуем комикс
     comics_posting(params, img_file_name, comics_comment)
     # Удаляем скачанный файл
