@@ -44,7 +44,7 @@ def download_rnd_comics():
         return img_file_name, comics_comment
 
 
-def comics_posting(params, img_file_name, comics_comment):
+def publish_comics(params, img_file_name, comics_comment):
     params = params
     # Получаем адрес сервера для загрузки фото
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
@@ -98,7 +98,7 @@ def main():
     # Скачиваем комикс
     img_file_name, comics_comment = download_rnd_comics()
     # Публикуем комикс
-    comics_posting(params, img_file_name, comics_comment)
+    publish_comics(params, img_file_name, comics_comment)
     # Удаляем скачанный файл
     os.remove(img_file_name)
 
