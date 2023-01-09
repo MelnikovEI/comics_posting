@@ -45,7 +45,6 @@ def download_rnd_comics():
 
 
 def publish_comics(params, img_file_name, comics_comment):
-    params = params
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     vk_response = requests.get(url, params=params)
     vk_response.raise_for_status()
