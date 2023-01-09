@@ -39,9 +39,9 @@ def download_rnd_comics():
     img_link = comics_item['img']
     comics_comment = comics_item['alt']
     if img_link:
-        img_file_mane = f'comics_{numb}{get_ext(img_link)}'
-        download_image(img_link, img_file_mane)
-        return img_file_mane, comics_comment
+        img_file_name = f'comics_{numb}{get_ext(img_link)}'
+        download_image(img_link, img_file_name)
+        return img_file_name, comics_comment
 
 
 def comics_posting(params, img_file_name, comics_comment):
