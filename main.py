@@ -46,13 +46,11 @@ def download_rnd_comics():
 
 def publish_comics(params, img_file_name, comics_comment):
     params = params
-    # Получаем адрес сервера для загрузки фото
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     vk_response = requests.get(url, params=params)
     vk_response.raise_for_status()
     upload_url = vk_response.json()['response']['upload_url']
 
-    # Отправляем фото на сервер
     with open(img_file_name, 'rb') as file:
         files = {
             'photo': file,
@@ -61,7 +59,6 @@ def publish_comics(params, img_file_name, comics_comment):
         vk_response.raise_for_status()
         uploaded_photo_params = vk_response.json()
 
-    # Сохраняем фото на стене
     params.update({
         'server': uploaded_photo_params['server'],
         'photo': uploaded_photo_params['photo'],
@@ -72,7 +69,6 @@ def publish_comics(params, img_file_name, comics_comment):
     vk_response.raise_for_status()
     uploaded_photo = vk_response.json()
 
-    # Публикуем комикс в группе
     photo_id = uploaded_photo['response'][0]['id']
     owner_id = uploaded_photo['response'][0]['owner_id']
     url = 'https://api.vk.com/method/wall.post'
@@ -95,11 +91,8 @@ def main():
         'from_group': '1',
     }
 
-    # Скачиваем комикс
     img_file_name, comics_comment = download_rnd_comics()
-    # Публикуем комикс
     publish_comics(params, img_file_name, comics_comment)
-    # Удаляем скачанный файл
     os.remove(img_file_name)
 
 
