@@ -15,8 +15,8 @@ Script posts one random comics from [xkcd.com](https://xkcd.com/) to VK communit
 
 4. Create environment variables in "your_project_folder\\ .env" file:
 - VK_GROUP_ID= group_id from p.1 above.
-- CLIENT_ID= client_id from p.2 above.
-- ACCESS_TOKEN= access_token from p.3 above.
+- VK_CLIENT_ID= client_id from p.2 above.
+- VK_ACCESS_TOKEN= access_token from p.3 above.
    
 5. Python3 should be already installed.
 

@@ -44,55 +44,83 @@ def download_rnd_comics():
         return img_file_name, comics_comment
 
 
-def publish_comics(params, img_file_name, comics_comment):
+def get_vk_upload_url(vk_access_token, vk_group_id):
+    params = {
+        'access_token': vk_access_token,
+        'v': VK_API_VERSION,
+        'group_id': vk_group_id,
+    }
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     vk_response = requests.get(url, params=params)
     vk_response.raise_for_status()
     upload_url = vk_response.json()['response']['upload_url']
+    return upload_url
 
+
+def upload_img_to_server(vk_upload_url, img_file_name):
     with open(img_file_name, 'rb') as file:
         files = {
             'photo': file,
         }
-        vk_response = requests.post(upload_url, files=files)
+        vk_response = requests.post(vk_upload_url, files=files)
         vk_response.raise_for_status()
-        uploaded_photo_params = vk_response.json()
+    uploaded_photo_params = vk_response.json()
+    return uploaded_photo_params
 
-    params.update({
-        'server': uploaded_photo_params['server'],
-        'photo': uploaded_photo_params['photo'],
-        'hash': uploaded_photo_params['hash'],
-    })
+
+def save_img_to_community(vk_access_token, vk_group_id, server, photo, photo_hash):
+    params = {
+        'access_token': vk_access_token,
+        'v': VK_API_VERSION,
+        'group_id': vk_group_id,
+        'server': server,
+        'photo': photo,
+        'hash': photo_hash,
+    }
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
     vk_response = requests.post(url, params=params)
     vk_response.raise_for_status()
     uploaded_photo = vk_response.json()
+    return uploaded_photo
 
-    photo_id = uploaded_photo['response'][0]['id']
-    owner_id = uploaded_photo['response'][0]['owner_id']
+
+def publish_comics(vk_access_token, owner_id, vk_group_id, photo_id, comics_comment):
     url = 'https://api.vk.com/method/wall.post'
-    params.update({
+    params = {
+        'access_token': vk_access_token,
+        'v': VK_API_VERSION,
         'attachments': f"photo{owner_id}_{photo_id}",
+        'owner_id': f"-{vk_group_id}",
+        'from_group': '1',
         'message': comics_comment,
-    })
+    }
     vk_response = requests.post(url, params=params)
     vk_response.raise_for_status()
 
 
 def main():
+    img_file_name, comics_comment = download_rnd_comics()
+
     env = Env()
     env.read_env()
-    params = {
-        'access_token': env('ACCESS_TOKEN'),
-        'v': VK_API_VERSION,
-        'group_id': env('VK_GROUP_ID'),
-        'owner_id': f"-{env('VK_GROUP_ID')}",
-        'from_group': '1',
-    }
+    vk_group_id = env('VK_GROUP_ID')
+    vk_access_token = env('VK_ACCESS_TOKEN')
 
-    img_file_name, comics_comment = download_rnd_comics()
-    publish_comics(params, img_file_name, comics_comment)
-    os.remove(img_file_name)
+    try:
+        vk_upload_url = get_vk_upload_url(vk_access_token, vk_group_id)
+
+        uploaded_photo_params = upload_img_to_server(vk_upload_url, img_file_name)
+        server = uploaded_photo_params['server']
+        photo = uploaded_photo_params['photo']
+        photo_hash = uploaded_photo_params['hash']
+
+        uploaded_photo = save_img_to_community(vk_access_token, vk_group_id, server, photo, photo_hash)
+        photo_id = uploaded_photo['response'][0]['id']
+        owner_id = uploaded_photo['response'][0]['owner_id']
+
+        publish_comics(vk_access_token, owner_id, vk_group_id, photo_id, comics_comment)
+    finally:
+        os.remove(img_file_name)
 
 
 if __name__ == '__main__':
