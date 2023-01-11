@@ -44,6 +44,11 @@ def download_rnd_comics():
         return img_file_name, comics_comment
 
 
+def check_vk_response(response):
+    if 'error' in response:
+        raise requests.HTTPError(response['error']['error_msg'])
+
+
 def get_vk_upload_url(vk_access_token, vk_group_id):
     params = {
         'access_token': vk_access_token,
@@ -53,6 +58,7 @@ def get_vk_upload_url(vk_access_token, vk_group_id):
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     vk_response = requests.get(url, params=params)
     vk_response.raise_for_status()
+    check_vk_response(vk_response.json())
     upload_url = vk_response.json()['response']['upload_url']
     return upload_url
 
@@ -65,6 +71,7 @@ def upload_img_to_server(vk_upload_url, img_file_name):
         vk_response = requests.post(vk_upload_url, files=files)
     vk_response.raise_for_status()
     uploaded_photo_params = vk_response.json()
+    check_vk_response(uploaded_photo_params)
     return uploaded_photo_params
 
 
@@ -81,6 +88,7 @@ def save_img_to_community(vk_access_token, vk_group_id, server, photo, photo_has
     vk_response = requests.post(url, params=params)
     vk_response.raise_for_status()
     uploaded_photo = vk_response.json()
+    check_vk_response(uploaded_photo)
     return uploaded_photo
 
 
@@ -96,6 +104,7 @@ def publish_comics(vk_access_token, owner_id, vk_group_id, photo_id, comics_comm
     }
     vk_response = requests.post(url, params=params)
     vk_response.raise_for_status()
+    check_vk_response(vk_response.json())
 
 
 def main():
