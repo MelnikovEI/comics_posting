@@ -31,15 +31,15 @@ def get_last_comics_number():
 
 
 def download_rnd_comics():
-    numb = random.randint(1, get_last_comics_number())
-    comics_url = f"https://xkcd.com/{numb}/info.0.json"
+    comics_number = random.randint(1, get_last_comics_number())
+    comics_url = f"https://xkcd.com/{comics_number}/info.0.json"
     xkcd_response = requests.get(comics_url)
     xkcd_response.raise_for_status()
     comics_item = xkcd_response.json()
     img_link = comics_item['img']
     comics_comment = comics_item['alt']
     if img_link:
-        img_file_name = f'comics_{numb}{get_ext(img_link)}'
+        img_file_name = f'comics_{comics_number}{get_ext(img_link)}'
         download_image(img_link, img_file_name)
         return img_file_name, comics_comment
 
