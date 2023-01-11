@@ -63,7 +63,7 @@ def upload_img_to_server(vk_upload_url, img_file_name):
             'photo': file,
         }
         vk_response = requests.post(vk_upload_url, files=files)
-        vk_response.raise_for_status()
+    vk_response.raise_for_status()
     uploaded_photo_params = vk_response.json()
     return uploaded_photo_params
 
